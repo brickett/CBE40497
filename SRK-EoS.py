@@ -25,3 +25,7 @@ capOmega = 0.480 + 1.574*omega-0.176*omega^2
 a=0.42748*R^2*Tc^2/Pc*(1+capOmega*(1-Tr^0.5))^2
 b=0.08664*R*Tc/Pc
 
+# Calculate second round SRK parameters
+Aprime = a*pres/(R*temp)^2
+Bprime = b*pres/(R*temp)
+
