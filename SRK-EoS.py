@@ -41,10 +41,37 @@ def srk(z):
 #solve for roots
 Z = sci.optimize.fsolve(srk, 0.1)
 
-if len(Z)>1:
-    print("long")
+if temp>Tc:  #condition in which T is above Tc means only one real solution
+    V=Z[1]*R*temp/pres
+    np.set_printoptions(precision=4)
+    print('/n V = {} L/mol'.format(V[1]))
 else:
-    print("short")
+    # Use Antoine equation to determine saturation pressure
+    # Select proper range of coefficients from NIST WebBook
+    if temp<=230:
+        A = 4.01158
+        B = 834.26
+        C = -22.763
+    elif temp<=320:
+        A = 3.98292
+        B = 819.296
+        C = -24.417
+    else:
+        A = 4.53678
+        B = 1149.36
+        C = -24.906
+    Psat = np.exp(A - B/(C+temp))
+    Psat = round(Psat, 2)
+    # Select the proper number of roots by comparing pres to Psat
+    if pres>Psat:
+        #compressed liquid -> smallest root
+        print("compressed")
+    elif pres<Psat:
+        #superheated vapor -> largest root
+        print("superheated")
+    else:
+        #saturated system -> smallest=saturated liquid, largest=saturated vapor
+        print("saturated")
 
 
                 
