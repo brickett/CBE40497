@@ -6,9 +6,12 @@ Created on Wed Jan 25 08:45:16 2017
 """
 
 import numpy as np
-import scipy as sci
+#import scipy.optimize as sci
+#import scipy.optimize as sci #import just the optimize library
+from scipy.optimize import fsolve # imports just the function you need
 
 print("Calculate molar volume of propane")
+
 print("Input Parameters")
 # The function takes inputs of temperature (K) and pressure (bar)
 temp=input("Temperature in K = ")
@@ -16,6 +19,9 @@ pres=input("Pressure in bar = ")
 # convert to float
 temp=float(temp)
 pres=float(pres)
+"""
+To make this section more robust, make sure that the string looks like a number
+"""
 
 #temp=300.
 #pres=0.01
@@ -42,11 +48,14 @@ def srk(z):
     return y
 
 #solve for roots
-Z = sci.optimize.fsolve(srk, 0.1)
+Z = fsolve(srk, 0.1) 
+"""the function is a first class variable - it's an object
+including parentheses and an input only evaluates the return of the function
+"""
 
 if temp>Tc:  #condition in which T is above Tc means only one real solution
     V=Z*R*temp/pres
-    print('\nV = {0:1.3f} L/mol\n'.format(V[0]))
+    print('\nV = {0:0.3f} L/mol\n'.format(V[0]))
 else:
     # Use Antoine equation to determine saturation pressure
     # Select proper range of coefficients from NIST WebBook
@@ -65,22 +74,24 @@ else:
     Psat = np.exp(A - B/(C+temp))
     Psat = round(Psat, 2)
     # Select the proper number of roots by comparing pres to Psat
-    if pres>Psat:
-        #compressed liquid -> smallest root
-         V=Z*R*temp/pres
-         print('\nV = {0:1.3f} L/mol\n'.format(V[0]))
-         print("compressed")
-    elif pres<Psat:
-        #superheated vapor -> largest root
-         V=Z*R*temp/pres
-         print('\nV = {0:1.3f} L/mol\n'.format(V[-1]))
-         print("superheated")
-    else:
+    if abs(Psat-pres)<0.01:    #could also use numpy.allclose
         #saturated system -> smallest=saturated liquid, largest=saturated vapor
          V=Z*R*temp/pres
          print('\nV = {0:1.3f} L/mol, saturated liquid\n'.format(V[0]))
          print('\nV = {0:1.3f} L/mol\n'.format(V[-1]))
          print("saturated")
+    
+    elif pres>Psat:
+        #compressed liquid -> smallest root
+         V=Z*R*temp/pres
+         print('\nV = {0:1.3f} L/mol\n'.format(V[0]))
+         print("compressed")
+         
+    elif pres<Psat:
+        #superheated vapor -> largest root
+         V=Z*R*temp/pres
+         print('\nV = {0:1.3f} L/mol\n'.format(V[-1]))
+         print("superheated")
 
 
                 
