@@ -17,6 +17,9 @@ pres=input("Pressure in bar = ")
 temp=float(temp)
 pres=float(pres)
 
+#temp=300.
+#pres=0.01
+
 # set critical properties (source: NIST WebBook)
 Tc=369.9 #K 
 Pc=42.5  #bar
@@ -42,9 +45,8 @@ def srk(z):
 Z = sci.optimize.fsolve(srk, 0.1)
 
 if temp>Tc:  #condition in which T is above Tc means only one real solution
-    V=Z[1]*R*temp/pres
-    np.set_printoptions(precision=4)
-    print('/n V = {} L/mol'.format(V[1]))
+    V=Z*R*temp/pres
+    print('\nV = {0:1.3f} L/mol\n'.format(V[0]))
 else:
     # Use Antoine equation to determine saturation pressure
     # Select proper range of coefficients from NIST WebBook
@@ -65,13 +67,20 @@ else:
     # Select the proper number of roots by comparing pres to Psat
     if pres>Psat:
         #compressed liquid -> smallest root
-        print("compressed")
+         V=Z*R*temp/pres
+         print('\nV = {0:1.3f} L/mol\n'.format(V[0]))
+         print("compressed")
     elif pres<Psat:
         #superheated vapor -> largest root
-        print("superheated")
+         V=Z*R*temp/pres
+         print('\nV = {0:1.3f} L/mol\n'.format(V[-1]))
+         print("superheated")
     else:
         #saturated system -> smallest=saturated liquid, largest=saturated vapor
-        print("saturated")
+         V=Z*R*temp/pres
+         print('\nV = {0:1.3f} L/mol, saturated liquid\n'.format(V[0]))
+         print('\nV = {0:1.3f} L/mol\n'.format(V[-1]))
+         print("saturated")
 
 
                 
